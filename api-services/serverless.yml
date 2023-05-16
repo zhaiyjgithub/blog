@@ -35,7 +35,6 @@ provider:
         identitySource:
           - $request.header.X-Api-Key
           - $request.header.X-App-Name
-          - $request.header.X-App-Token
         resultTtlInSeconds: 300
         enableSimpleResponses: true
         payloadVersion: "2.0"
@@ -81,7 +80,7 @@ resources:
           - AttributeName: OrganizationID
             AttributeType: S
           - AttributeName: CreatedAt
-            AttributeType: N
+            AttributeType: S
           - AttributeName: MessageID
             AttributeType: S
         KeySchema:
