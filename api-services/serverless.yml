@@ -39,7 +39,7 @@ provider:
         enableSimpleResponses: true
         payloadVersion: "2.0"
   environment:
-    MESSAGING_TABLE: ${self:service}-${opt:stage, self:provider.stage}-messaging
+    MESSAGING_TABLE: ${self:service}-${opt:stage, self:provider.stage}-message
     STAGE: ${opt:stage, self:provider.stage}
 
 package:
@@ -75,7 +75,7 @@ resources:
     MessagingTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
-        TableName: ${self:service}-${opt:stage, self:provider.stage}-messaging
+        TableName: ${self:service}-${opt:stage, self:provider.stage}-message
         AttributeDefinitions:
           - AttributeName: OrganizationID
             AttributeType: S
