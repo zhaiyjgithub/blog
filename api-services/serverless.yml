@@ -39,8 +39,8 @@ provider:
         enableSimpleResponses: true
         payloadVersion: "2.0"
   environment:
-    MESSAGING_TABLE: ${self:service}-${opt:stage, self:provider.stage}-message
-    STAGE: ${opt:stage, self:provider.stage}
+    message_table: ${self:service}-${opt:stage, self:provider.stage}-message
+    stage: ${opt:stage, self:provider.stage}
 
 package:
   patterns:
@@ -54,6 +54,8 @@ functions:
       salt: ~!@9&6_!@$@56d
   sendMessage:
     handler: bin/sendMessage
+    environment:
+      sqs_sender_worker_queue_name: SenderWorker
     events:
       - httpApi:
           path: /sendMessage

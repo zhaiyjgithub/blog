@@ -25,9 +25,9 @@ type Message struct {
 }
 
 func (m *Message) TableName() string {
-	tableName := os.Getenv("MESSAGING_TABLE")
+	tableName := os.Getenv("message_table")
 	if len(tableName) == 0 {
-		log.Fatalln("MESSAGING_TABLE is empty")
+		log.Fatalln("message_table is empty")
 	}
 	return tableName
 }
