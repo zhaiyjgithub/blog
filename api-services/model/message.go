@@ -20,8 +20,10 @@ type Message struct {
 	CallbackURLParam map[string]string
 	ReceiverID string
 	ReceiverName string
-	Text string
-	Status MessageStatus
+	ReceiverEmail string
+	Subject string
+	HtmlBody     string
+	Status       MessageStatus
 }
 
 func (m *Message) TableName() string {

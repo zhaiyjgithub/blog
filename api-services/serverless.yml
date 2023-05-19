@@ -56,6 +56,8 @@ functions:
     handler: bin/sendMessage
     environment:
       sqs_sender_worker_queue_name: SenderWorker
+      email_sender: chuck.zhaiyj@gmail.com
+      email_sender_app_password: isnejfxzaniutstq
     events:
       - httpApi:
           path: /sendMessage
