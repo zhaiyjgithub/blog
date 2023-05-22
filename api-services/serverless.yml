@@ -33,14 +33,21 @@ provider:
         type: request
         functionName: authorizer
         identitySource:
-          - $request.header.X-Api-Key
-          - $request.header.X-App-Name
+          - $request.header.x-api-key
+          - $request.header.x-app-name
         resultTtlInSeconds: 300
         enableSimpleResponses: true
         payloadVersion: "2.0"
   environment:
-    message_table: ${self:service}-${opt:stage, self:provider.stage}-message
     stage: ${opt:stage, self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - '*'
+          Resource:
+            - '*'
 
 package:
   patterns:
@@ -76,42 +83,6 @@ functions:
               - Arn
 resources:
   Resources:
-    MessagingTable:
-      Type: "AWS::DynamoDB::Table"
-      Properties:
-        TableName: ${self:service}-${opt:stage, self:provider.stage}-message
-        AttributeDefinitions:
-          - AttributeName: OrganizationID
-            AttributeType: S
-          - AttributeName: CreatedAt
-            AttributeType: S
-          - AttributeName: MessageID
-            AttributeType: S
-        KeySchema:
-          - AttributeName: OrganizationID
-            KeyType: HASH
-          - AttributeName: CreatedAt
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        StreamSpecification:
-          StreamViewType: NEW_AND_OLD_IMAGES
-        GlobalSecondaryIndexes:
-          - IndexName: MessageID-CreatedAt-index
-            KeySchema:
-              - AttributeName: MessageID
-                KeyType: HASH
-              - AttributeName: CreatedAt
-                KeyType: RANGE
-            Projection:
-              ProjectionType: INCLUDE
-              NonKeyAttributes:
-                - CallbackURL
-                - CalbackParams
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
     SenderWorkerQueue:
       Type: "AWS::SQS::Queue"
       Properties:

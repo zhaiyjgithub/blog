@@ -8,8 +8,8 @@ import (
 type MessageStatus string
 const (
 	Sending MessageStatus = "Sending"
-	Sent MessageStatus = "Sent"
-	Failed MessageStatus = " Failed"
+	Sent    MessageStatus = "Sent"
+	Failed  MessageStatus = " Failed"
 )
 
 type Message struct {
@@ -22,8 +22,8 @@ type Message struct {
 	ReceiverName string
 	ReceiverEmail string
 	Subject string
-	HtmlBody     string
-	Status       MessageStatus
+	HtmlBody string
+	Status   MessageStatus
 }
 
 func (m *Message) TableName() string {

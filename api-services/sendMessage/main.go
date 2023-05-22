@@ -32,6 +32,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if len(qName) == 0 {
 		log.Fatalln("sqs_sender_worker_queue_name is empty")
 	}
+	fmt.Println("queue name", qName)
 	sqsService := NewSqsService(qName)
 	skip := 0
 	page := 10
@@ -59,11 +60,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 }
 
 func pagingData(input []Message, skip int, page int) []Message {
-	if skip < len(input) {
+	if skip > len(input) {
 		skip = len(input)
 	}
 	end := skip + page
-	if end < len(input) {
+	if end > len(input) {
 		end = len(input)
 	}
 	return input[skip: end]

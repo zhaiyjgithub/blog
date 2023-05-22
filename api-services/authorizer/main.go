@@ -20,11 +20,9 @@ func main() {
 }
 
 func handleRequest(_ context.Context, event events.APIGatewayV2CustomAuthorizerV2Request) (events.APIGatewayV2CustomAuthorizerSimpleResponse, error) {
-	//- $request.header.X-Api-Key
-	//- $request.header.X-App-Name
 	headers := event.Headers
-	key := headers["X-Api-Key"]
-	appName := headers["X-App-Name"]
+	key := headers["x-api-key"]
+	appName := headers["x-app-name"]
 	fmt.Println("X-Api-Key", key, "X-App-Name", appName)
 	ok := verifyApiKey(appName, key)
 	authResponse := events.APIGatewayV2CustomAuthorizerSimpleResponse{IsAuthorized: ok}

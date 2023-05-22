@@ -1,0 +1,89 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: ihms-message-service
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: go1.x
+  environment:
+    message_table: ${self:service}-${opt:stage, self:provider.stage}-message
+    stage: ${opt:stage, self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - '*'
+          Resource:
+            - '*'
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  messageService:
+    handler: bin/handler
+    environment:
+      stage:
+    events:
+      - http:
+          path: /handler
+          method: post
+          authorizer: aws_iam
+resources:
+  Resources:
+    MessagingTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${self:service}-${opt:stage, self:provider.stage}-message
+        AttributeDefinitions:
+          - AttributeName: OrganizationID
+            AttributeType: S
+          - AttributeName: CreatedAt
+            AttributeType: S
+          - AttributeName: MessageID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: OrganizationID
+            KeyType: HASH
+          - AttributeName: CreatedAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        GlobalSecondaryIndexes:
+          - IndexName: MessageID-CreatedAt-index
+            KeySchema:
+              - AttributeName: MessageID
+                KeyType: HASH
+              - AttributeName: CreatedAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: INCLUDE
+              NonKeyAttributes:
+                - CallbackURL
+                - CalbackParams
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1

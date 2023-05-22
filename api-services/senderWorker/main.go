@@ -5,7 +5,8 @@
 package main
 
 import (
-	"blog/api-services/model"
+	"blog/fnService"
+	"blog/message-service/model"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,7 +20,7 @@ func main() {
 	lambda.Start(handler)
 }
 
-func handler(_ context.Context, sqsEvent events.SQSEvent) error {
+func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	for _, record := range sqsEvent.Records {
 		fmt.Println("SQS record", record.Body)
 		var m model.Message
@@ -30,7 +31,25 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) error {
 		if err := sendEmail(m.ReceiverEmail, m.Subject, m.HtmlBody); err != nil {
 			m.Status = model.Failed
 		}
+
 		// save message
+		payload := fnService.FnRequestPayload{
+			ResolverName: "saveMessage",
+			Body: m,
+		}
+		out, err := fnService.CallFn(ctx, fnService.FnRequest{
+			ServiceName: "ihms-message-service",
+			FunctionName: "messageService",
+			Payload: payload,
+		})
+		if out != nil {
+			fmt.Printf("out: %v\r\n", out)
+		}
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		// save message, invoke message service to save message
 		// send callback
 
 	}
