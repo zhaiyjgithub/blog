@@ -91,10 +91,5 @@ func sendEmail(to []string, subject string, htmlBody string) error {
 
     auth := smtp.PlainAuth("", sender, password, host)
 
-    err := smtp.SendMail(address, auth, sender, to, message)
-    if err != nil {
-        panic(err)
-    }
-
-	return nil
+   	return smtp.SendMail(address, auth, sender, to, message)
 }
