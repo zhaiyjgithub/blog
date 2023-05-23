@@ -11,8 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"gopkg.in/gomail.v2"
@@ -30,10 +28,10 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 			return err
 		}
 		if err := saveMesage(ctx, record.Body); err != nil {
-			fmt.Println("Save message failed", err.Error, record.Body)
+			fmt.Println("Save message failed", err.Error(), record.Body)
 			continue
 		}
-		
+
 		err := sendEmail(sm.ReceiverID, sm.Subject, sm.HtmlBody)
 		status := model.Sending
 		if err != nil {
@@ -42,9 +40,11 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 			status = model.Sent
 		}
 		// send email and updte message status by pk-sk
-		updateMessageStatus(sm.OrganizationID, sm.CreatedAt, status)
-		// send callback
-
+		err = updateMessageStatus(ctx, sm.OrganizationID, sm.CreatedAt, status)
+		if err != nil {
+			fmt.Printf("Update message status failed: %v\r\n", err.Error())
+		}
+		// send callback if callbackURL is NOT empty
 	}
 	return nil
 }
@@ -62,8 +62,23 @@ func saveMesage(ctx context.Context, body string) error {
 	return err
 }
 
-func updateMessageStatus(organzationID string, createdAt string, status model.MessageStatus) {
+func updateMessageStatus(ctxt context.Context, organzationID string, createdAt string, status model.MessageStatus) error {
+	body := make(map[string]string)
+	body["OrganizationID"] = organzationID
+	body["CreatedAt"] = createdAt
+	body["status"] = string(status)
+	jb, _ := json.Marshal(body)
 
+	payload := fnService.FnRequestPayload{
+		ResolverName: "updateMessageStatus",
+		Body:         string(jb),
+	}
+	_, err := fnService.CallFn(ctxt, fnService.FnRequest{
+		ServiceName:  "ihms-message-service",
+		FunctionName: "messageService",
+		Payload:      payload,
+	})
+	return err
 }
 
 func sendEmail(to string, subject string, htmlBody string) error {
