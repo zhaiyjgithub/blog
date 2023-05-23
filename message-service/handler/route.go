@@ -2,38 +2,48 @@ package main
 
 import (
 	"blog/fnService"
-	"blog/message-service/model"
 	"blog/message-service/resolvers"
+	"blog/message-service/shared/model"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-lambda-go/events"
 )
 
-func Route(r fnService.FnRequest) (events.APIGatewayProxyResponse, error) {
-	resp := events.APIGatewayProxyResponse{
+func Route(payload fnService.FnRequestPayload) (fnService.FnResponse, error) {
+	resp := fnService.FnResponse{
 		StatusCode:      200,
-		IsBase64Encoded: false,
 		Body:            "",
 	}
 	var err error
-	payload := r.Payload
-
 	switch payload.ResolverName {
 	case "saveMessage":
-		m, ok := payload.Body.(model.Message)
-		if !ok {
+		var m model.Message
+		err = json.Unmarshal([]byte(payload.Body), &m)
+		if err != nil {
 			fmt.Printf("body: %v", payload.Body)
-			fmt.Println("parse body failed", err.Error())
-
+			resp.StatusCode = 400
+			resp.Body = err.Error()
 		} else {
 			_ = resolvers.SaveMessage(m)
 		}
-		return resp, nil
+	case "UpdateMesageStatus":
+		var p struct {
+			OrganizationID string
+			CreatedAt      string
+			Status model.MessageStatus
+		}
+		if err = json.Unmarshal([]byte(payload.Body), &p); err != nil {
+			resp.StatusCode = 400
+			resp.Body = err.Error()
+		}else {
+			_ = resolvers.UpdateMesageStatus(p.OrganizationID, p.CreatedAt, p.Status)
+		}
+
 	default:
 		resp.StatusCode = 400
-		errText := fmt.Sprintf("%s is not found", r.ServiceName)
+		errText := fmt.Sprintf("%s is not found", payload.ResolverName)
 		err = errors.New(errText)
-		return resp, err
 	}
+	return resp, err
 }
 

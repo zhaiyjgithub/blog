@@ -42,13 +42,7 @@ package:
 functions:
   messageService:
     handler: bin/handler
-    environment:
-      stage:
-    events:
-      - http:
-          path: /handler
-          method: post
-          authorizer: aws_iam
+
 resources:
   Resources:
     MessagingTable:

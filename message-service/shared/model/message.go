@@ -24,6 +24,7 @@ type Message struct {
 	Subject string
 	HtmlBody string
 	Status   MessageStatus
+	UpdatedAt string
 }
 
 func (m *Message) TableName() string {

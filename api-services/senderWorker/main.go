@@ -5,15 +5,17 @@
 package main
 
 import (
+	"blog/api-services/shared/model"
 	"blog/fnService"
-	"blog/message-service/model"
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"gopkg.in/gomail.v2"
-	"os"
 )
 
 func main() {
@@ -22,38 +24,46 @@ func main() {
 
 func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	for _, record := range sqsEvent.Records {
-		fmt.Println("SQS record", record.Body)
-		var m model.Message
-		if err := json.Unmarshal([]byte(record.Body), &m); err != nil {
-			fmt.Println("Parse record body failed", err.Error())
+		var sm model.SqsMessage
+		if err := json.Unmarshal([]byte(record.Body), &sm); err != nil {
+			fmt.Println("Unmarshal record body failed", err.Error())
 			return err
 		}
-		if err := sendEmail(m.ReceiverEmail, m.Subject, m.HtmlBody); err != nil {
-			m.Status = model.Failed
+		if err := saveMesage(ctx, record.Body); err != nil {
+			fmt.Println("Save message failed", err.Error, record.Body)
+			continue
 		}
-
-		// save message
-		payload := fnService.FnRequestPayload{
-			ResolverName: "saveMessage",
-			Body: m,
-		}
-		out, err := fnService.CallFn(ctx, fnService.FnRequest{
-			ServiceName: "ihms-message-service",
-			FunctionName: "messageService",
-			Payload: payload,
-		})
-		if out != nil {
-			fmt.Printf("out: %v\r\n", out)
-		}
+		
+		err := sendEmail(sm.ReceiverID, sm.Subject, sm.HtmlBody)
+		status := model.Sending
 		if err != nil {
-			fmt.Println(err.Error())
+			status = model.Failed
+		} else {
+			status = model.Sent
 		}
-
-		// save message, invoke message service to save message
+		// send email and updte message status by pk-sk
+		updateMessageStatus(sm.OrganizationID, sm.CreatedAt, status)
 		// send callback
 
 	}
 	return nil
+}
+
+func saveMesage(ctx context.Context, body string) error {
+	payload := fnService.FnRequestPayload{
+		ResolverName: "saveMessage",
+		Body:         body,
+	}
+	_, err := fnService.CallFn(ctx, fnService.FnRequest{
+		ServiceName:  "ihms-message-service",
+		FunctionName: "messageService",
+		Payload:      payload,
+	})
+	return err
+}
+
+func updateMessageStatus(organzationID string, createdAt string, status model.MessageStatus) {
+
 }
 
 func sendEmail(to string, subject string, htmlBody string) error {

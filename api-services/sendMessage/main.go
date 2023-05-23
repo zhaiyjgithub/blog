@@ -1,20 +1,23 @@
 package main
 
 import (
+	"blog/api-services/shared/model"
 	"blog/utils"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"time"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
-	"log"
-	"os"
-	"strconv"
 )
 
 func main() {
@@ -38,6 +41,9 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	page := 10
 	for {
 		pageData := pagingData(p.Data, skip, page)
+		for _, pd := range pageData {
+			pd.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
+		}
 		if len(pageData) == 0 {
 			break
 		}
@@ -59,7 +65,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	return utils.Success(nil, "Success")
 }
 
-func pagingData(input []Message, skip int, page int) []Message {
+func pagingData(input []model.SqsMessage, skip int, page int) []model.SqsMessage {
 	if skip > len(input) {
 		skip = len(input)
 	}
@@ -115,14 +121,6 @@ func (s *SqsService) SendBatchMessages(data []string) (*sqs.SendMessageBatchOutp
 }
 
 type Param struct {
-	Data []Message `json:"data" validate:"gt=0,dive"`
+	Data []model.SqsMessage `json:"data" validate:"gt=0,dive"`
 }
 
- type Message struct {
-	OrganizationID string `json:"organizationID" validate:"required,gt=0"`
-	CallbackURL string `json:"callbackURL"`
-	CallbackURLParam map[string]string `json:"callbackURLParam"`
-	ReceiverID string `json:"receiverID" validate:"required"`
-	ReceiverName string `json:"receiverName" validate:"required"`
-	Text string `json:"text" validate:"required,gt=0"`
-}
