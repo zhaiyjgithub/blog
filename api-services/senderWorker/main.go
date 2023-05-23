@@ -10,10 +10,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/smtp"
 	"os"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"gopkg.in/gomail.v2"
 )
 
 func main() {
@@ -32,7 +32,7 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 			continue
 		}
 
-		err := sendEmail(sm.ReceiverID, sm.Subject, sm.HtmlBody)
+		err := sendEmail([]string{sm.ReceiverID}, sm.Subject, sm.HtmlBody)
 		status := model.Sending
 		if err != nil {
 			status = model.Failed
@@ -81,19 +81,20 @@ func updateMessageStatus(ctxt context.Context, organzationID string, createdAt s
 	return err
 }
 
-func sendEmail(to string, subject string, htmlBody string) error {
+func sendEmail(to []string, subject string, htmlBody string) error {
 	sender := os.Getenv("email_sender")
 	password := os.Getenv("email_sender_app_password")
-	m := gomail.NewMessage()
-	m.SetHeader("From", sender)
-	m.SetHeader("To", to)
-	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", htmlBody)
+    host := "smtp.gmail.com"
+    port := "587"
+    address := host + ":" + port
+    message := []byte("Subject:" + subject + "\n" + htmlBody)
 
-	d := gomail.NewDialer("smtp.gmail.com", 587, "Message Service", password)
+    auth := smtp.PlainAuth("", sender, password, host)
 
-	if err := d.DialAndSend(m); err != nil {
-		return err
-	}
+    err := smtp.SendMail(address, auth, sender, to, message)
+    if err != nil {
+        panic(err)
+    }
+
 	return nil
 }
