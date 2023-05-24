@@ -35,6 +35,7 @@ require (
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.3 // indirect
 	golang.org/x/crypto v0.7.0 // indirect

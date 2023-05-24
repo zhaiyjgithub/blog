@@ -18,6 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+	"github.com/gofrs/uuid"
 )
 
 func main() {
@@ -35,20 +36,18 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if len(qName) == 0 {
 		log.Fatalln("sqs_sender_worker_queue_name is empty")
 	}
-	fmt.Println("queue name", qName)
 	sqsService := NewSqsService(qName)
 	skip := 0
 	page := 10
 	for {
 		pageData := pagingData(p.Data, skip, page)
-		for _, pd := range pageData {
-			pd.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
-		}
 		if len(pageData) == 0 {
 			break
 		}
 		var dataString []string
-		for _, d := range pageData{
+		for _, d := range pageData {
+			d.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
+			d.MessageID = getUUID()
 			jb, err := json.Marshal(d)
 			if err != nil {
 				fmt.Println("Marshal page data failed", err.Error())
@@ -65,6 +64,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	return utils.Success(nil, "Success")
 }
 
+func getUUID() string {
+	UUID, _ := uuid.NewV4()
+	return UUID.String()
+}
+
 func pagingData(input []model.SqsMessage, skip int, page int) []model.SqsMessage {
 	if skip > len(input) {
 		skip = len(input)
@@ -73,11 +77,11 @@ func pagingData(input []model.SqsMessage, skip int, page int) []model.SqsMessage
 	if end > len(input) {
 		end = len(input)
 	}
-	return input[skip: end]
+	return input[skip:end]
 }
 
 type SqsService struct {
-	Client *sqs.Client
+	Client   *sqs.Client
 	QueueUrl *string
 }
 
@@ -94,7 +98,7 @@ func NewSqsService(qName string) SqsService {
 	}
 	return SqsService{
 		QueueUrl: out.QueueUrl,
-		Client: client,
+		Client:   client,
 	}
 }
 
@@ -105,8 +109,7 @@ func (s *SqsService) SendBatchMessages(data []string) (*sqs.SendMessageBatchOutp
 	if len(data) > 10 {
 		return nil, errors.New("batch length maxim is 10 in a batch")
 	}
-	var entries []types.SendMessageBatchRequestEntry
-	entries = make([]types.SendMessageBatchRequestEntry, len(data))
+	entries := make([]types.SendMessageBatchRequestEntry, len(data))
 
 	for i, body := range data {
 		entries[i] = types.SendMessageBatchRequestEntry{
@@ -123,4 +126,3 @@ func (s *SqsService) SendBatchMessages(data []string) (*sqs.SendMessageBatchOutp
 type Param struct {
 	Data []model.SqsMessage `json:"data" validate:"gt=0,dive"`
 }
-

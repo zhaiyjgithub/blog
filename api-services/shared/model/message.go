@@ -10,6 +10,7 @@ const (
 type SqsMessage struct {
 	OrganizationID string `json:"organizationID" validate:"required,gt=0"`
 	CreatedAt string `json:"createdAt"`
+	MessageID string `json:"MessageID"`
 	CallbackURL string `json:"callbackURL"`
 	CallbackURLParam map[string]string `json:"callbackURLParam"`
 	ReceiverID string `json:"receiverID" validate:"required"`

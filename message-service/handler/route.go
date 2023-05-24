@@ -14,19 +14,22 @@ func Route(payload fnService.FnRequestPayload) (fnService.FnResponse, error) {
 		StatusCode:      200,
 		Body:            "",
 	}
+	fmt.Printf("payload body: %v\r\n", payload.Body)
 	var err error
 	switch payload.ResolverName {
-	case "saveMessage":
+	case "SaveMessage":
 		var m model.Message
 		err = json.Unmarshal([]byte(payload.Body), &m)
 		if err != nil {
-			fmt.Printf("body: %v", payload.Body)
 			resp.StatusCode = 400
 			resp.Body = err.Error()
 		} else {
-			_ = resolvers.SaveMessage(m)
+			if err = resolvers.SaveMessage(m); err != nil {
+				resp.StatusCode = 400
+				resp.Body = err.Error()
+			}
 		}
-	case "UpdateMesageStatus":
+	case "UpdateMessageStatus":
 		var p struct {
 			OrganizationID string
 			CreatedAt      string
@@ -36,7 +39,10 @@ func Route(payload fnService.FnRequestPayload) (fnService.FnResponse, error) {
 			resp.StatusCode = 400
 			resp.Body = err.Error()
 		}else {
-			_ = resolvers.UpdateMesageStatus(p.OrganizationID, p.CreatedAt, p.Status)
+			if err = resolvers.UpdateMesageStatus(p.OrganizationID, p.CreatedAt, p.Status); err != nil {
+				resp.StatusCode = 400
+				resp.Body = err.Error()
+			}
 		}
 
 	default:

@@ -51,7 +51,7 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 
 func saveMesage(ctx context.Context, body string) error {
 	payload := fnService.FnRequestPayload{
-		ResolverName: "saveMessage",
+		ResolverName: "SaveMessage",
 		Body:         body,
 	}
 	_, err := fnService.CallFn(ctx, fnService.FnRequest{
@@ -70,7 +70,7 @@ func updateMessageStatus(ctxt context.Context, organzationID string, createdAt s
 	jb, _ := json.Marshal(body)
 
 	payload := fnService.FnRequestPayload{
-		ResolverName: "updateMessageStatus",
+		ResolverName: "UpdateMessageStatus",
 		Body:         string(jb),
 	}
 	_, err := fnService.CallFn(ctxt, fnService.FnRequest{
