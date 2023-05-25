@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-05-25T06:13:51.623Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" etag="3ls5xQzamliMO3dj7BqO" version="21.3.3" type="github">
+<mxfile host="app.diagrams.net" modified="2023-05-25T07:55:38.848Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" etag="MyTEJrniW7BT1XOOwjWS" version="21.3.3" type="github">
   <diagram id="ZTbM8DwjV0BJ23-4vNRd" name="Page-1">
-    <mxGraphModel dx="1793" dy="764" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+    <mxGraphModel dx="1762" dy="703" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -131,7 +131,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="M6G5RoZs1-UaxuztppJ4-9" value="Message Service" style="swimlane;whiteSpace=wrap;html=1;fillColor=#008a00;strokeColor=#005700;fontColor=#ffffff;" vertex="1" parent="1">
-          <mxGeometry x="1856" y="1940" width="770" height="300" as="geometry" />
+          <mxGeometry x="1856" y="1940" width="724" height="300" as="geometry" />
         </mxCell>
         <mxCell id="M6G5RoZs1-UaxuztppJ4-23" value="handler" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;" vertex="1" parent="M6G5RoZs1-UaxuztppJ4-9">
           <mxGeometry x="49" y="60" width="241" height="200" as="geometry" />
@@ -139,7 +139,7 @@
         <mxCell id="M6G5RoZs1-UaxuztppJ4-35" value="&lt;h1&gt;Resolver router&lt;/h1&gt;&lt;p&gt;Get resolver name and route to target resolver to complete some process.&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="M6G5RoZs1-UaxuztppJ4-23">
           <mxGeometry x="25.5" y="60" width="190" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="M6G5RoZs1-UaxuztppJ4-26" value="Router" style="shape=singleArrow;whiteSpace=wrap;html=1;arrowWidth=0.4;arrowSize=0.4;" vertex="1" parent="M6G5RoZs1-UaxuztppJ4-9">
+        <mxCell id="M6G5RoZs1-UaxuztppJ4-26" value="Router" style="shape=singleArrow;whiteSpace=wrap;html=1;arrowWidth=0.4;arrowSize=0.4;fillColor=#bac8d3;strokeColor=#23445d;" vertex="1" parent="M6G5RoZs1-UaxuztppJ4-9">
           <mxGeometry x="320" y="130" width="140" height="60" as="geometry" />
         </mxCell>
         <mxCell id="M6G5RoZs1-UaxuztppJ4-28" value="resolvers" style="swimlane;whiteSpace=wrap;html=1;fillColor=#6d8764;fontColor=#ffffff;strokeColor=#3A5431;" vertex="1" parent="M6G5RoZs1-UaxuztppJ4-9">
@@ -165,6 +165,12 @@
         </mxCell>
         <mxCell id="M6G5RoZs1-UaxuztppJ4-19" value="&lt;h1&gt;Invoke Lambda&lt;/h1&gt;&lt;p&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;For the internal communication. Pass a data from a lambda function to the another lambda function by invoking lambda. Not any http calling.&lt;/b&gt;&lt;/font&gt;&lt;/p&gt;&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(43, 43, 43); font-family: Menlo, Monaco, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 21px;&quot;&gt;&lt;div&gt;client.Invoke(ctx, &lt;span style=&quot;color: #a9b7c6;font-weight: bold;&quot;&gt;&amp;amp;&lt;/span&gt;lambda.InvokeInput{&lt;/div&gt;&lt;div&gt;        FunctionName: aws.&lt;span style=&quot;color: #ffc66d;&quot;&gt;String&lt;/span&gt;(fnName),&lt;/div&gt;&lt;div&gt;        Payload: jb,&lt;/div&gt;&lt;div&gt;    })&lt;/div&gt;&lt;/div&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="1465" y="1710" width="320" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="M6G5RoZs1-UaxuztppJ4-36" value="&lt;b&gt;&lt;i&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Diagram for Message Service&lt;/font&gt;&lt;/i&gt;&lt;/b&gt;" style="text;html=1;strokeColor=#005700;fillColor=#008a00;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="810" y="750" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="M6G5RoZs1-UaxuztppJ4-38" value="&lt;b&gt;&lt;i&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Project structure for Message Service&lt;/font&gt;&lt;/i&gt;&lt;/b&gt;" style="text;html=1;strokeColor=#005700;fillColor=#008a00;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="870" y="1720" width="390" height="50" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
