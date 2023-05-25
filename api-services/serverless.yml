@@ -27,18 +27,18 @@ provider:
   runtime: go1.x
   region: us-east-1
   stage: dev
-  httpApi:
+  httpApi: # Configure a custom authorizer for all the http api. Like SendMessage API below.
     authorizers:
       customAuthorizer:
         type: request
         functionName: authorizer
-        identitySource:
+        identitySource: # Required header keys in api header
           - $request.header.x-api-key
           - $request.header.x-app-name
         resultTtlInSeconds: 300
         enableSimpleResponses: true
         payloadVersion: "2.0"
-  environment:
+  environment: # Create environment variables for all lambda functions.
     stage: ${opt:stage, self:provider.stage}
   iam:
     role:
@@ -55,17 +55,17 @@ package:
     - ./bin/**
 
 functions:
-  authorizer:
+  authorizer: # Lambda function name
     handler: bin/authorizer
-    environment:
+    environment: # Create a environment variable for this lambda function only
       salt: ~!@9&6_!@$@56d
-  sendMessage:
-    handler: bin/sendMessage
-    environment:
+  sendMessage: # Lambda function name
+    handler: bin/sendMessage # Lambda function handler. See Makefile
+    environment: # Create a environment variable for this lambda function only
       sqs_sender_worker_queue_name: SenderWorker
       email_sender: chuck.zhaiyj@gmail.com
-      email_sender_app_password: isnejfxzaniutstq
-    events:
+      email_sender_app_password: <App Password>
+    events: # Configure this lambda function as httpApi drivered and authed by custom authorizer.
       - httpApi:
           path: /sendMessage
           method: post
@@ -73,7 +73,7 @@ functions:
             name: customAuthorizer
   senderWorker:
     handler: bin/worker
-    events:
+    events: # Configure this lambda function as SQS lambda trigger.
       - sqs:
           batchSize: 10
           maximumBatchingWindow: 60
@@ -82,8 +82,8 @@ functions:
               - SenderWorkerQueue
               - Arn
 resources:
-  Resources:
-    SenderWorkerQueue:
+  Resources: # Configure some required aws resource. Here is SQS only
+    SenderWorkerQueue: # aws resource name. It will refered by senderWorker lambda function.
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: "SenderWorker"
+        QueueName: "SenderWorker" # Set SQS queue name. Serverless Framework will create a SQS with this queue name.

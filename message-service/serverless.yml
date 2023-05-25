@@ -40,23 +40,23 @@ package:
     - ./bin/**
 
 functions:
-  messageService:
-    handler: bin/handler
+  messageService: # Lambda name. 
+    handler: bin/handler # Just lambda function only. Will be invoked by any event.
 
 resources:
   Resources:
-    MessagingTable:
+    MessagingTable: 
       Type: "AWS::DynamoDB::Table"
       Properties:
         TableName: ${self:service}-${opt:stage, self:provider.stage}-message
-        AttributeDefinitions:
+        AttributeDefinitions: # Set Partition Key and Sort key
           - AttributeName: OrganizationID
             AttributeType: S
           - AttributeName: CreatedAt
             AttributeType: S
           - AttributeName: MessageID
             AttributeType: S
-        KeySchema:
+        KeySchema: 
           - AttributeName: OrganizationID
             KeyType: HASH
           - AttributeName: CreatedAt
@@ -66,7 +66,7 @@ resources:
           WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
-        GlobalSecondaryIndexes:
+        GlobalSecondaryIndexes: # Create a second index. Just for example
           - IndexName: MessageID-CreatedAt-index
             KeySchema:
               - AttributeName: MessageID
