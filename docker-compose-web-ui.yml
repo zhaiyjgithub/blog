@@ -8,4 +8,4 @@ services:
     # 集群名称
     - KAFKA_CLUSTERS_0_NAME=local
     # 集群地址
-    - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-0:9092,kafka-1:9092,kafka-2:9092
+    - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:9192,kafka-2:9292,kafka-3:9392
