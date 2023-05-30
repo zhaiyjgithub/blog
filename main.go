@@ -14,7 +14,7 @@ func main() {
     config.Consumer.Group.Session.Timeout = 10 * time.Second
     config.Consumer.Group.Heartbeat.Interval = 3 * time.Second
     // 创建一个Kafka消费者实例
-    consumer, err := sarama.NewConsumer([]string{"localhost:9092"}, config)
+    consumer, err := sarama.NewConsumer([]string{"localhost:9094", "localhost:9095", "localhost:9096"}, config)
     if err != nil {
         log.Fatalf("Failed to create consumer: %s", err)
     }
@@ -24,7 +24,7 @@ func main() {
         }
     }()
     // 创建一个Kafka生产者实例
-    producer, err := sarama.NewAsyncProducer([]string{"localhost:9092"}, config)
+    producer, err := sarama.NewAsyncProducer([]string{"localhost:9094", "localhost:9095", "localhost:9096"}, config)
     if err != nil {
         log.Fatalf("Failed to create producer: %s", err)
     }
