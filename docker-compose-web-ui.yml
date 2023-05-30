@@ -2,10 +2,10 @@ services:
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
-    ports:
-      - 8080:8080
+    bootstrapServers: localhost:9094
     environment:
-    # 集群名称
-    - KAFKA_CLUSTERS_0_NAME=local
-    # 集群地址
-    - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:9192,kafka-2:9292,kafka-3:9392
+      KAFKA_CLUSTERS_0_NAME: local
+      # other properties, omitted
+      SPRING_CONFIG_ADDITIONAL-LOCATION: /config.yml
+    volumes:
+      - ./ui/config.yml:/config.yml
