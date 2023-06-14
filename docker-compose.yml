@@ -1,9 +1,5 @@
 version: "3"
 
-networks:
-  kafka-cluster:
-    driver: bridge
-
 services:
   kafka1:
     image: bitnami/kafka:latest
@@ -20,7 +16,7 @@ services:
     - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092,EXTERNAL://localhost:9094
     - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
     volumes:
-      - ./kafka1/kafka:/bitnami/kafka
+      - ./kafka/kafka1/kafka:/bitnami/kafka
   kafka2:
     image: bitnami/kafka:latest
     networks:
@@ -36,7 +32,7 @@ services:
     - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka2:9092,EXTERNAL://localhost:9095
     - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
     volumes:
-      - ./kafka2/kafka:/bitnami/kafka
+      - ./kafka/kafka2/kafka:/bitnami/kafka
   kafka3:
     image: bitnami/kafka:latest
     networks:
@@ -52,15 +48,57 @@ services:
     - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka3:9092,EXTERNAL://localhost:9096
     - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
     volumes:
-      - ./kafka3/kafka:/bitnami/kafka
+      - ./kafka/kafka3/kafka:/bitnami/kafka
 
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
     networks:
       - kafka-cluster
     ports:
-      - 8080:8080
+      - "8080:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092,kafka2:9092,kafka3:9092
+
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - kafka-cluster
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345678
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=12345678
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  debezium:
+    image: debezium/connect:latest
+    depends_on:
+      - kafka3
+      - kafka2
+      - kafka1
+      - kafka-ui
+      - mysql
+    ports:
+      - "8083:8083"
+    networks:
+      - kafka-cluster
+    environment:
+      - BOOTSTRAP_SERVERS=kafka1:9092,kafka2:9092,kafka3:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_source_connect_statuses
+
+networks:
+  kafka-cluster:
+    driver: bridge
