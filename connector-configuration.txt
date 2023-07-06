@@ -37,3 +37,11 @@
   "tasks": [],
   "type": "source"
 }
+
+
+./kafka-topics.sh --create --bootstrap-server b-2.ngphmskcluster.pc82kl.c21.kafka.us-east-1.amazonaws.com:9098,b-3.ngphmskcluster.pc82kl.c21.kafka.us-east-1.amazonaws.com:9098,b-1.ngphmskcluster.pc82kl.c21.kafka.us-east-1.amazonaws.com:9098 --command-config client.properties --replication-factor 3 --partitions 1 --topic ngph-msk-test-topic
+
+aws s3 cp ./debezium-connector-sqlserver.zip s3://ngph-msk-connector-bucket/debezium-plugins/
+
+
+
